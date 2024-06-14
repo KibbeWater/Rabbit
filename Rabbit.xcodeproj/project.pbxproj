@@ -3,7 +3,7 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 56;
+	objectVersion = 60;
 	objects = {
 
 /* Begin PBXBuildFile section */
@@ -16,7 +16,7 @@
 		808A02892C1C4C4400C8FB58 /* VisionTip.swift in Sources */ = {isa = PBXBuildFile; fileRef = 808A02872C1C4C4400C8FB58 /* VisionTip.swift */; };
 		808A028A2C1C4C4400C8FB58 /* MicTip.swift in Sources */ = {isa = PBXBuildFile; fileRef = 808A02862C1C4C4400C8FB58 /* MicTip.swift */; };
 		808A028C2C1C69C500C8FB58 /* Config.swift in Sources */ = {isa = PBXBuildFile; fileRef = 808A028B2C1C69C500C8FB58 /* Config.swift */; };
-		80A3CAF22C1C7A740088E725 /* RabbitKit in Frameworks */ = {isa = PBXBuildFile; productRef = 80A3CAF12C1C7A740088E725 /* RabbitKit */; };
+		80A3CAF62C1C7B760088E725 /* RabbitKit in Frameworks */ = {isa = PBXBuildFile; productRef = 80A3CAF52C1C7B760088E725 /* RabbitKit */; };
 		80F80FD42C0E0617004FCBEC /* Root.swift in Sources */ = {isa = PBXBuildFile; fileRef = 80F80FD32C0E0617004FCBEC /* Root.swift */; };
 		80F80FD62C0E0617004FCBEC /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 80F80FD52C0E0617004FCBEC /* ContentView.swift */; };
 		80F80FD82C0E0617004FCBEC /* Item.swift in Sources */ = {isa = PBXBuildFile; fileRef = 80F80FD72C0E0617004FCBEC /* Item.swift */; };
@@ -69,7 +69,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				80F8100D2C0E4DD5004FCBEC /* KeychainAccess in Frameworks */,
-				80A3CAF22C1C7A740088E725 /* RabbitKit in Frameworks */,
+				80A3CAF62C1C7B760088E725 /* RabbitKit in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -193,7 +193,7 @@
 			name = Rabbit;
 			packageProductDependencies = (
 				80F8100C2C0E4DD5004FCBEC /* KeychainAccess */,
-				80A3CAF12C1C7A740088E725 /* RabbitKit */,
+				80A3CAF52C1C7B760088E725 /* RabbitKit */,
 			);
 			productName = Rabbit;
 			productReference = 80F80FD02C0E0617004FCBEC /* Rabbit.app */;
@@ -225,7 +225,7 @@
 			mainGroup = 80F80FC72C0E0617004FCBEC;
 			packageReferences = (
 				80F8100B2C0E4DD5004FCBEC /* XCRemoteSwiftPackageReference "KeychainAccess" */,
-				80A3CAF02C1C7A740088E725 /* XCRemoteSwiftPackageReference "RabbitKit" */,
+				80A3CAF42C1C7B760088E725 /* XCLocalSwiftPackageReference "RabbitKit" */,
 			);
 			productRefGroup = 80F80FD12C0E0617004FCBEC /* Products */;
 			projectDirPath = "";
@@ -502,15 +502,14 @@
 		};
 /* End XCConfigurationList section */
 
-/* Begin XCRemoteSwiftPackageReference section */
-		80A3CAF02C1C7A740088E725 /* XCRemoteSwiftPackageReference "RabbitKit" */ = {
-			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/KibbeWater/RabbitKit.git";
-			requirement = {
-				branch = main;
-				kind = branch;
-			};
+/* Begin XCLocalSwiftPackageReference section */
+		80A3CAF42C1C7B760088E725 /* XCLocalSwiftPackageReference "RabbitKit" */ = {
+			isa = XCLocalSwiftPackageReference;
+			relativePath = RabbitKit;
 		};
+/* End XCLocalSwiftPackageReference section */
+
+/* Begin XCRemoteSwiftPackageReference section */
 		80F8100B2C0E4DD5004FCBEC /* XCRemoteSwiftPackageReference "KeychainAccess" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/kishikawakatsumi/KeychainAccess.git";
@@ -522,9 +521,8 @@
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
-		80A3CAF12C1C7A740088E725 /* RabbitKit */ = {
+		80A3CAF52C1C7B760088E725 /* RabbitKit */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = 80A3CAF02C1C7A740088E725 /* XCRemoteSwiftPackageReference "RabbitKit" */;
 			productName = RabbitKit;
 		};
 		80F8100C2C0E4DD5004FCBEC /* KeychainAccess */ = {

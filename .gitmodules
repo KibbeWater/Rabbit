@@ -1,0 +1,3 @@
+[submodule "RabbitKit"]
+	path = RabbitKit
+	url = https://github.com/KibbeWater/RabbitKit.git
