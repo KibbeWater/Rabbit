@@ -20,6 +20,8 @@ struct RabbitApp: App {
     @AppStorage("disclaimerShown")
     private var disclaimerShown: Bool = false
     
+    @State private var settingsOpen = false
+    
     var sharedModelContainer: ModelContainer = {
         let schema = Schema([
             /* Item.self, */
@@ -48,7 +50,25 @@ struct RabbitApp: App {
                     AuthenticatingView()
                         .transition(.opacity)
                 }
+                
+                VStack {
+                    HStack {
+                        Spacer()
+                        Button {
+                            settingsOpen.toggle()
+                        } label: {
+                            Image(systemName: "gear")
+                                .resizable()
+                                .frame(width: 24, height: 24)
+                                .padding(.trailing)
+                        }
+                    }
+                    Spacer()
+                }
             }
+            .sheet(isPresented: $settingsOpen, content: {
+                SettingsPane(isOpen: $settingsOpen)
+            })
             .task {
                 if let _savedVol = savedVol {
                     rabbitHole.rabbitPlayer.audioPlayer?.setVolume(

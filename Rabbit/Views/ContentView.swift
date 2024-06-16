@@ -43,8 +43,6 @@ struct ContentView: View {
     
     @State private var speechUnrecognized = false
     
-    @State private var settingsOpen = false
-    
     @Namespace private var animationNamespace
     
     // Tips
@@ -123,17 +121,6 @@ struct ContentView: View {
     var body: some View {
         NavigationStack {
             VStack {
-                HStack {
-                    Spacer()
-                    Button {
-                        settingsOpen.toggle()
-                    } label: {
-                        Image(systemName: "gear")
-                            .resizable()
-                            .frame(width: 24, height: 24)
-                            .padding(.trailing)
-                    }
-                }
                 VStack {
                     if isVisionOpen {
                         GeometryReader { geo in
@@ -250,9 +237,6 @@ struct ContentView: View {
                 .padding(.bottom)
             }
         }
-        .sheet(isPresented: $settingsOpen, content: {
-            SettingsPane(isOpen: $settingsOpen)
-        })
         .task {
             await AVAudioApplication.requestRecordPermission()
             // Just initialize and cache thumbnail for quicker startups

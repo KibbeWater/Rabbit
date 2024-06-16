@@ -28,6 +28,11 @@ struct RegisterView: View {
     
     @State private var isDisclaimerShown: Bool = false
     
+    var rbtHoleLink: AttributedString {
+        var attributedString = try! AttributedString(markdown: "[hole.rabbit.tech](https://hole.rabbit.tech/)")
+        attributedString.foregroundColor = .accent
+        return attributedString
+    }
     
     var body: some View {
         VStack {
@@ -131,10 +136,7 @@ struct RegisterView: View {
             }
             Spacer()
             HStack(spacing: 6) {
-                Text("Register at")
-                Button("hole.rabbit.tech") {
-                    openURL(URL(string: "https://hole.rabbit.tech")!)
-                }
+                Text("Register at \(rbtHoleLink)")
                 Spacer()
             }
             .font(.footnote)

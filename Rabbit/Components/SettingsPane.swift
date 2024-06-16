@@ -21,6 +21,14 @@ struct SettingsPane: View {
     
     @Binding var isOpen: Bool
     
+    @State var proxyUrl: String = ""
+    
+    var rsgLink: AttributedString {
+        var attributedString = try! AttributedString(markdown: "[rabbitserver-go](https://firmburrow.rabbitu.de/Snow/rabbitserver-go)")
+        attributedString.foregroundColor = .accent
+        return attributedString
+    }
+    
     var body: some View {
         List {
             Section(header: Text("General")) {
@@ -38,6 +46,29 @@ struct SettingsPane: View {
                         .foregroundColor(.secondary)
                     }
                 }
+            }
+            
+            Section(header: Text("Proxy")) {
+                HStack{
+                    TextField("Proxy URL", text: $proxyUrl)
+                    Button("Set") {
+                        if let _url = URL(string: proxyUrl) {
+                            Config.shared.setWsURL(_url)
+                            rabbitHole.reconnect(_url)
+                        }
+                    }
+                    .buttonStyle(.bordered)
+                    .disabled(!canSetProxy(proxyUrl))
+                    .autocorrectionDisabled()
+                    .textInputAutocapitalization(.never)
+                    Button("Reset") {
+                        Config.shared.resetWsURL()
+                        proxyUrl = ""
+                        rabbitHole.reconnect(Config.shared.wsURL)
+                    }
+                    .buttonStyle(.bordered)
+                }
+                Text("Run your own instance of \(rsgLink)")
             }
             
             Section(header: Text("Account")) {
@@ -113,6 +144,16 @@ struct SettingsPane: View {
                 volume = _v
             }
         }
+        .task {
+            if Config.shared.isWsURLSet() {
+                self.proxyUrl = Config.shared.wsURL.absoluteString
+            }
+        }
+    }
+    
+    func canSetProxy(_ pUrl: String) -> Bool {
+        guard let url = URL(string: pUrl) else { return false }
+        return Config.shared.wsURL.absoluteString != url.absoluteString
     }
 }
 
