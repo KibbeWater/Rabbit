@@ -167,18 +167,28 @@ struct ContentView: View {
                     Spacer()
                     TipView(micTip)
                     HStack {
-                        Image("Rabbit")
-                            .resizable()
-                            .aspectRatio(contentMode: .fit)
-                            .frame(height: !isVisionOpen && images.isEmpty ? 128 : 64)
-                            .offset(y: isBouncing ? 5 : -5)
-                            .onAppear {
-                                withAnimation(.bounce()) {
-                                    isBouncing.toggle()
+                        if !rabbitHole.isMeetingActive {
+                            Image("Rabbit")
+                                .resizable()
+                                .aspectRatio(contentMode: .fit)
+                                .frame(height: !isVisionOpen && images.isEmpty ? 128 : 64)
+                                .offset(y: isBouncing ? 5 : -5)
+                                .onAppear {
+                                    withAnimation(.bounce()) {
+                                        isBouncing.toggle()
+                                    }
                                 }
-                            }
-                            .transition(.slide)
-                            .id("rabbit")
+                                .transition(.slide)
+                                .id("rabbit")
+                        } else {
+                            Image(systemName: "recordingtape")
+                                .resizable()
+                                .aspectRatio(contentMode: .fit)
+                                .frame(width: !isVisionOpen && images.isEmpty ? 128 : 64)
+                                .transition(.slide)
+                                .symbolEffect(.pulse, options: .repeat(.max))
+                                .id("rabbit")
+                        }
                         if isVisionOpen || !images.isEmpty {
                             chatbox
                                 .padding(.leading)
@@ -192,43 +202,74 @@ struct ContentView: View {
                     }
                 }
                 HStack {
-                    TextField("Chat", text: $message)
-                        .focused($chatIsFocused)
+                    if !rabbitHole.isMeetingActive {
+                        TextField("Chat", text: $message)
+                            .focused($chatIsFocused)
+                            .transition(.blurReplace)
+                        Button("Submit") {
+                            guard !message.isEmpty else { return }
+                            
+                            let msg = message
+                            message = ""
+                            self.rabbitHole.sendText(msg)
+                            VisionTip.messageEvent.sendDonation()
+                            if isVisionOpen {
+                                MicTip.chattedInVision.sendDonation()
+                            }
+                            
+                            chatIsFocused = false
+                        }
+                        .buttonStyle(.borderedProminent)
                         .transition(.blurReplace)
-                    Button("Submit") {
-                        guard !message.isEmpty else { return }
-                        
-                        let msg = message
-                        message = ""
-                        self.rabbitHole.sendText(msg)
-                        VisionTip.messageEvent.sendDonation()
-                        if isVisionOpen {
-                            MicTip.chattedInVision.sendDonation()
-                        }
-                        
-                        chatIsFocused = false
-                    }
-                    .buttonStyle(.borderedProminent)
-                    .transition(.blurReplace)
                     
-                    Button("Vision") {
-                        visionTip.invalidate(reason: .actionPerformed)
-                        withAnimation {
-                            isVisionOpen.toggle()
+                    
+                        Button("Vision") {
+                            visionTip.invalidate(reason: .actionPerformed)
+                            withAnimation {
+                                isVisionOpen.toggle()
+                            }
                         }
+                        .popoverTip(visionTip)
+                        .buttonStyle(.bordered)
                     }
-                    .popoverTip(visionTip)
-                    .buttonStyle(.bordered)
+                    
+                    if rabbitHole.isMeetingActive {
+                        Button {
+                            rabbitHole.stopMeeting()
+                        } label: {
+                            Text("End Voice Recording")
+                                .frame(maxWidth: .infinity)
+                        }
+                        .buttonStyle(.borderedProminent)
+                        .frame(maxWidth: .infinity)
+                    }
                     
                     Button(action: {
+                        if rabbitHole.isMeetingActive {
+                            
+                        }
+                        
                         withAnimation {
                             isMicOpen.toggle()
                         }
                     }, label: {
-                        if !isMicOpen {
-                            Image(systemName: "mic.fill")
+                        if #available(iOS 18, *) {
+                            Image(
+                                systemName:
+                                    !isMicOpen ?
+                                "microphone.fill" : "microphone.slash.fill"
+                            )
+                            .contentTransition(.symbolEffect(
+                                .replace.magic(
+                                    fallback: .downUp.byLayer
+                                )
+                            ))
                         } else {
-                            Image(systemName: "mic.fill.badge.xmark")
+                            Image(
+                                systemName:
+                                    !isMicOpen ?
+                                "microphone.fill" : "microphone.slash.fill"
+                            )
                         }
                     })
                     .buttonStyle(.bordered)
