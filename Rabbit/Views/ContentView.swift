@@ -12,6 +12,7 @@ import VisionKit
 import AVFAudio
 import Combine
 import TipKit
+import UIKit
 
 extension Animation {
     static func bounce() -> Animation {
@@ -268,7 +269,7 @@ struct ContentView: View {
                             Image(
                                 systemName:
                                     !isMicOpen ?
-                                "microphone.fill" : "microphone.slash.fill"
+                                "mic.fill" : "mic.slash.fill"
                             )
                         }
                     })
@@ -286,7 +287,6 @@ struct ContentView: View {
         }
         .onChange(of: isMicOpen) { _, val in
             if !val {
-                print("Stopped")
                 audioRecorder.stopRecording { _buf in
                     if let buf = _buf {
                         sendBuf(buf)
