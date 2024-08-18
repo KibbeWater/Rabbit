@@ -24,7 +24,7 @@ struct SettingsPane: View {
     @State var proxyUrl: String = ""
     
     var rsgLink: AttributedString {
-        var attributedString = try! AttributedString(markdown: "[rabbitserver-go](https://firmburrow.rabbitu.de/Snow/rabbitserver-go)")
+        var attributedString = try! AttributedString(markdown: "[rabbitserver-go](https://github.com/KibbeWater/rabbitserver-go)")
         attributedString.foregroundColor = .accent
         return attributedString
     }
