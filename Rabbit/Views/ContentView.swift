@@ -226,7 +226,97 @@ struct ContentView: View {
                         chatbox
                     }
                 }
-                
+                HStack {
+                    if !rabbitHole.isMeetingActive {
+                        TextField("Chat", text: $message)
+                            .focused($chatIsFocused)
+                            .transition(.blurReplace)
+                        Button("Submit") {
+                            guard !message.isEmpty else { return }
+                            
+                            let msg = message
+                            message = ""
+                            self.rabbitHole.sendText(msg)
+                            VisionTip.messageEvent.sendDonation()
+                            if isVisionOpen {
+                                MicTip.chattedInVision.sendDonation()
+                            }
+                            
+                            chatIsFocused = false
+                        }
+                        .buttonStyle(.borderedProminent)
+                        .transition(.blurReplace)
+                        
+                        
+                        Button("Vision") {
+                            visionTip.invalidate(reason: .actionPerformed)
+                            withAnimation {
+                                isVisionOpen.toggle()
+                            }
+                        }
+                        .popoverTip(visionTip)
+                        .buttonStyle(.bordered)
+                        
+                        Button(action: {
+                            guard isMicOpen else {
+                                MicHoldTip.micNotHeld.sendDonation()
+                                return
+                            }
+                            notificationFeedback.notificationOccurred(.success)
+                            micHoldTip.invalidate(reason: .actionPerformed)
+                            withAnimation {
+                                isMicOpen = false
+                            }
+                        }, label: {
+//                            if #available(iOS 18, *) {
+//                                Image(
+//                                    systemName:
+//                                        !isMicOpen ?
+//                                    "microphone.fill" : "microphone.slash.fill"
+//                                )
+//                                .contentTransition(.symbolEffect(
+//                                    .replace.magic(
+//                                        fallback: .downUp.byLayer
+//                                    )
+//                                ))
+//                            } else {
+                                Image(
+                                    systemName:
+                                        !isMicOpen ?
+                                    "mic.fill" : "mic.slash.fill"
+                                )
+                            // }
+                        })
+                        .popoverTip(micHoldTip)
+                        .simultaneousGesture(
+                            LongPressGesture(minimumDuration: 0.2)
+                                .onEnded({ _ in
+                                    impactFeedback.impactOccurred()
+                                    withAnimation {
+                                        isMicOpen = true
+                                    }
+                                })
+                        )
+                        .buttonStyle(.bordered)
+                    } else {
+                        Button {
+                            withAnimation {
+                                isMicOpen = false
+                            }
+                            DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+                                rabbitHole.stopMeeting()
+                            }
+                        } label: {
+                            Text("End Voice Recording")
+                                .frame(maxWidth: .infinity)
+                        }
+                        .buttonStyle(.borderedProminent)
+                        .frame(maxWidth: .infinity)
+                        .disabled(!isMicOpen)
+                    }
+                }
+                .padding(.horizontal)
+                .padding(.bottom)
             }
         }
         .task {
