@@ -255,24 +255,24 @@ struct ContentView: View {
                                 isMicOpen = false
                             }
                         }, label: {
-                            if #available(iOS 18, *) {
-                                Image(
-                                    systemName:
-                                        !isMicOpen ?
-                                    "microphone.fill" : "microphone.slash.fill"
-                                )
-                                .contentTransition(.symbolEffect(
-                                    .replace.magic(
-                                        fallback: .downUp.byLayer
-                                    )
-                                ))
-                            } else {
+//                            if #available(iOS 18, *) {
+//                                Image(
+//                                    systemName:
+//                                        !isMicOpen ?
+//                                    "microphone.fill" : "microphone.slash.fill"
+//                                )
+//                                .contentTransition(.symbolEffect(
+//                                    .replace.magic(
+//                                        fallback: .downUp.byLayer
+//                                    )
+//                                ))
+//                            } else {
                                 Image(
                                     systemName:
                                         !isMicOpen ?
                                     "mic.fill" : "mic.slash.fill"
                                 )
-                            }
+                            // }
                         })
                         .popoverTip(micHoldTip)
                         .simultaneousGesture(
