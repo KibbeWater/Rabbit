@@ -23,6 +23,10 @@ struct SettingsPane: View {
     
     @State var proxyUrl: String = ""
     
+    @State private var imei: String = ""
+    @State private var accountKey: String = ""
+    @State private var revealCreds: Bool = false
+    
     var rsgLink: AttributedString {
         var attributedString = try! AttributedString(markdown: "[rabbitserver-go](https://firmburrow.rabbitu.de/Snow/rabbitserver-go)")
         attributedString.foregroundColor = .accent
@@ -128,6 +132,21 @@ struct SettingsPane: View {
             }
             .onAppear {
                 rabbitHole.refreshStatus()
+            }
+            
+            Section(header: Text("Account Details")) {
+                Text("IMEI: \(!revealCreds ? "Hidden" : imei)")
+                Text("Account Key: \(!revealCreds ? "Hidden" : accountKey)")
+                Button(!revealCreds ? "Reveal" : "Hide") {
+                    revealCreds.toggle()
+                }
+            }
+            .onChange(of: revealCreds) { _, shouldReveal in
+                guard shouldReveal else { return }
+                if let creds = rabbitHole.getCredentials() {
+                    imei = creds.imei
+                    accountKey = creds.accountKey
+                }
             }
         }
         .onChange(of: volume) { _, newVol in
