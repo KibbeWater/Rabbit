@@ -1,22 +1,22 @@
 //
-//  MicTip.swift
+//  MicHoldTip.swift
 //  Rabbit
 //
-//  Created by Linus Rönnbäck Larsson on 2024-06-13.
+//  Created by Linus Rönnbäck Larsson on 28/8/24.
 //
 
 import Foundation
 import TipKit
 
-struct MicTip: Tip {
-    static let chattedInVision = Event(id: "wsChatWithVision")
+struct MicHoldTip: Tip {
+    static let micNotHeld = Event(id: "wsMicNotHeld")
     
     var title: Text {
-        Text("Use your mic for Vision prompts")
+        Text("Talk to Rabbit")
     }
     
     var message: Text? {
-        Text("When prompting about Vision, you need to use your mic. Press and hold the mic button to start recording.")
+        Text("Press and Hold the mic icon to start talking with your Rabbit.")
     }
     
     var image: Image? {
@@ -31,7 +31,7 @@ struct MicTip: Tip {
     
     var rules: [Rule] {
         [
-            #Rule(Self.chattedInVision) {
+            #Rule(Self.micNotHeld) {
                 $0.donations.count > 0
             }
         ]

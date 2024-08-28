@@ -31,10 +31,11 @@ struct ContentView: View {
     
     let fileURL = FileManager.default.temporaryDirectory.appendingPathComponent("recording.wav")
     @StateObject private var model = DataModel()
-    private var audioRecorder = PTTHandler()
+    @State private var audioRecorder = PTTHandler()
     
     @State private var isVisionOpen: Bool = false
     @State private var isMicOpen: Bool = false
+    @State private var audioURL: URL?
     
     @State private var currentlyPlaying: CurrentlyPlaying? = nil
     @State private var curPlaySink: AnyCancellable? = nil
@@ -49,8 +50,12 @@ struct ContentView: View {
     // Tips
     private var visionTip = VisionTip()
     private var micTip = MicTip()
+    private var micHoldTip = MicHoldTip()
     
     private var ttsBlockTimer: Timer? = nil
+    
+    let impactFeedback = UIImpactFeedbackGenerator(style: .medium)
+    let notificationFeedback = UINotificationFeedbackGenerator()
     
     func sendBuf(_ buf: Data?) -> Void {
         guard let recordedBuffer = buf else { return }
@@ -169,18 +174,24 @@ struct ContentView: View {
                     TipView(micTip)
                     HStack {
                         if !rabbitHole.isMeetingActive {
-                            Image("Rabbit")
-                                .resizable()
-                                .aspectRatio(contentMode: .fit)
-                                .frame(height: !isVisionOpen && images.isEmpty ? 128 : 64)
-                                .offset(y: isBouncing ? 5 : -5)
-                                .onAppear {
-                                    withAnimation(.bounce()) {
-                                        isBouncing.toggle()
+                            HStack(spacing: 24) {
+                                Image("Rabbit")
+                                    .resizable()
+                                    .aspectRatio(contentMode: .fit)
+                                    .frame(height: !isVisionOpen && images.isEmpty ? isMicOpen ? 128*0.8 : 128 : isMicOpen ? 64*0.8 : 64)
+                                    .offset(y: isBouncing ? 5 : -5)
+                                    .onAppear {
+                                        withAnimation(.bounce()) {
+                                            isBouncing.toggle()
+                                        }
                                     }
+                                    .transition(.slide)
+                                    .id("rabbit")
+                                if isMicOpen {
+                                    Image(systemName: "mic")
+                                        .font(.system(size: 82))
                                 }
-                                .transition(.slide)
-                                .id("rabbit")
+                            }
                         } else {
                             Image(systemName: "recordingtape")
                                 .resizable()
@@ -222,8 +233,8 @@ struct ContentView: View {
                         }
                         .buttonStyle(.borderedProminent)
                         .transition(.blurReplace)
-                    
-                    
+                        
+                        
                         Button("Vision") {
                             visionTip.invalidate(reason: .actionPerformed)
                             withAnimation {
@@ -232,48 +243,64 @@ struct ContentView: View {
                         }
                         .popoverTip(visionTip)
                         .buttonStyle(.bordered)
-                    }
-                    
-                    if rabbitHole.isMeetingActive {
+                        
+                        Button(action: {
+                            guard isMicOpen else {
+                                MicHoldTip.micNotHeld.sendDonation()
+                                return
+                            }
+                            notificationFeedback.notificationOccurred(.success)
+                            micHoldTip.invalidate(reason: .actionPerformed)
+                            withAnimation {
+                                isMicOpen = false
+                            }
+                        }, label: {
+                            if #available(iOS 18, *) {
+                                Image(
+                                    systemName:
+                                        !isMicOpen ?
+                                    "microphone.fill" : "microphone.slash.fill"
+                                )
+                                .contentTransition(.symbolEffect(
+                                    .replace.magic(
+                                        fallback: .downUp.byLayer
+                                    )
+                                ))
+                            } else {
+                                Image(
+                                    systemName:
+                                        !isMicOpen ?
+                                    "mic.fill" : "mic.slash.fill"
+                                )
+                            }
+                        })
+                        .popoverTip(micHoldTip)
+                        .simultaneousGesture(
+                            LongPressGesture(minimumDuration: 0.2)
+                                .onEnded({ _ in
+                                    impactFeedback.impactOccurred()
+                                    withAnimation {
+                                        isMicOpen = true
+                                    }
+                                })
+                        )
+                        .buttonStyle(.bordered)
+                    } else {
                         Button {
-                            rabbitHole.stopMeeting()
+                            withAnimation {
+                                isMicOpen = false
+                            }
+                            DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+                                rabbitHole.stopMeeting()
+                            }
                         } label: {
                             Text("End Voice Recording")
                                 .frame(maxWidth: .infinity)
                         }
                         .buttonStyle(.borderedProminent)
                         .frame(maxWidth: .infinity)
+                        .disabled(!isMicOpen)
                     }
-                    
-                    Button(action: {
-                        if rabbitHole.isMeetingActive {
-                            
-                        }
-                        
-                        withAnimation {
-                            isMicOpen.toggle()
-                        }
-                    }, label: {
-                        if #available(iOS 18, *) {
-                            Image(
-                                systemName:
-                                    !isMicOpen ?
-                                "microphone.fill" : "microphone.slash.fill"
-                            )
-                            .contentTransition(.symbolEffect(
-                                .replace.magic(
-                                    fallback: .downUp.byLayer
-                                )
-                            ))
-                        } else {
-                            Image(
-                                systemName:
-                                    !isMicOpen ?
-                                "mic.fill" : "mic.slash.fill"
-                            )
-                        }
-                    })
-                    .buttonStyle(.bordered)
                 }
                 .padding(.horizontal)
                 .padding(.bottom)
@@ -287,14 +314,20 @@ struct ContentView: View {
         }
         .onChange(of: isMicOpen) { _, val in
             if !val {
-                audioRecorder.stopRecording { _buf in
+                print("Stopped recording")
+                guard audioURL != nil else { return }
+                audioRecorder.stopRecording(audioURL!) { _buf in
                     if let buf = _buf {
                         sendBuf(buf)
                     }
                 }
             } else {
                 print("Started")
-                audioRecorder.startRecording()
+                if let url = audioRecorder.startRecording() {
+                    audioURL = url
+                } else {
+                    isMicOpen = false
+                }
             }
         }
         .onChange(of: rabbitHole.lastImages, { _, val in
@@ -314,6 +347,10 @@ struct ContentView: View {
                 images.removeAll()
                 imgIdx = 0
             }
+        })
+        .onChange(of: rabbitHole.isMeetingActive, { _, isMeetingActive in
+            guard isMeetingActive else { return }
+            isMicOpen.toggle()
         })
         .task {
             curPlaySink = rabbitHole.rabbitPlayer.$curPlaying.sink { curPlaying in

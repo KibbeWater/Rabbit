@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		8040F05F2C1329A600730C6C /* SettingsPane.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8040F05E2C1329A600730C6C /* SettingsPane.swift */; };
+		8047D5E62C7F777D00E47779 /* MicHoldTip.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8047D5E52C7F777D00E47779 /* MicHoldTip.swift */; };
 		8056AC402C0F42C700C0D7F1 /* CameraModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8056AC3F2C0F42C700C0D7F1 /* CameraModel.swift */; };
 		8056AC432C0F434700C0D7F1 /* Camera.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8056AC422C0F434700C0D7F1 /* Camera.swift */; };
 		8056AC452C0F441100C0D7F1 /* ViewfinderView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8056AC442C0F441100C0D7F1 /* ViewfinderView.swift */; };
@@ -42,6 +43,7 @@
 
 /* Begin PBXFileReference section */
 		8040F05E2C1329A600730C6C /* SettingsPane.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsPane.swift; sourceTree = "<group>"; };
+		8047D5E52C7F777D00E47779 /* MicHoldTip.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MicHoldTip.swift; sourceTree = "<group>"; };
 		8056AC3F2C0F42C700C0D7F1 /* CameraModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CameraModel.swift; sourceTree = "<group>"; };
 		8056AC422C0F434700C0D7F1 /* Camera.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Camera.swift; sourceTree = "<group>"; };
 		8056AC442C0F441100C0D7F1 /* ViewfinderView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewfinderView.swift; sourceTree = "<group>"; };
@@ -91,6 +93,7 @@
 			children = (
 				808A02862C1C4C4400C8FB58 /* MicTip.swift */,
 				808A02872C1C4C4400C8FB58 /* VisionTip.swift */,
+				8047D5E52C7F777D00E47779 /* MicHoldTip.swift */,
 			);
 			path = Tips;
 			sourceTree = "<group>";
@@ -267,6 +270,7 @@
 				8040F05F2C1329A600730C6C /* SettingsPane.swift in Sources */,
 				8056AC402C0F42C700C0D7F1 /* CameraModel.swift in Sources */,
 				8056AC472C0F491700C0D7F1 /* PTTHandler.swift in Sources */,
+				8047D5E62C7F777D00E47779 /* MicHoldTip.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
