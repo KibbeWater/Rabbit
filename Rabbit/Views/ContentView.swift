@@ -124,90 +124,103 @@ struct ContentView: View {
         .matchedGeometryEffect(id: "chatbox", in: animationNamespace)
     }
     
+    var viewfinder: some View {
+        GeometryReader { geo in
+            ViewfinderView(image:  $model.viewfinderImage )
+                .frame(width: geo.size.width, height: geo.size.height)
+        }
+        .clipShape(
+            RoundedRectangle(cornerRadius: 25.0)
+        )
+        .padding()
+        .transition(.scale.combined(with: .opacity))
+        .frame(maxWidth: .infinity, maxHeight: isVisionOpen ? .infinity : 0)
+        .onAppear {
+            Task {
+                await model.camera.start()
+            }
+        }
+        .onDisappear {
+            model.camera.stop()
+        }
+    }
+    
+    var imageViewfinder: some View {
+        GeometryReader { geo in
+            if let img = getImage() {
+                AsyncImage(url: img) { imgz in
+                    imgz
+                        .resizable()
+                        .scaledToFill()
+                } placeholder: {
+                    ProgressView()
+                }
+                
+            }
+        }
+        .clipShape(
+            RoundedRectangle(cornerRadius: 25.0)
+        )
+        .padding()
+        .transition(.scale.combined(with: .opacity))
+        .frame(maxWidth: .infinity, maxHeight: !images.isEmpty ? .infinity : 0)
+    }
+    
+    var rabbit: some View {
+        HStack {
+            if !rabbitHole.isMeetingActive {
+                HStack(spacing: 24) {
+                    Image("Rabbit")
+                        .resizable()
+                        .aspectRatio(contentMode: .fit)
+                        .frame(height: getRabbitIconSize())
+                        .offset(y: isBouncing ? 5 : -5)
+                        .onAppear {
+                            withAnimation(.bounce()) {
+                                isBouncing.toggle()
+                            }
+                        }
+                        .transition(.slide)
+                        .id("rabbit")
+                    if isMicOpen {
+                        Image(systemName: "mic")
+                            .font(.system(size: 82))
+                    }
+                }
+            } else {
+                Image(systemName: "recordingtape")
+                    .resizable()
+                    .aspectRatio(contentMode: .fit)
+                    .frame(width: !isVisionOpen && images.isEmpty ? 128 : 64)
+                    .transition(.slide)
+                    .symbolEffect(.pulse, options: .repeat(.max))
+                    .id("rabbit")
+            }
+            if isVisionOpen || !images.isEmpty {
+                chatbox
+                    .padding(.leading)
+                Spacer()
+            }
+        }
+        .padding(.horizontal)
+    }
+    
     var body: some View {
         NavigationStack {
             VStack {
                 VStack {
                     if isVisionOpen {
-                        GeometryReader { geo in
-                            ViewfinderView(image:  $model.viewfinderImage )
-                            .frame(width: geo.size.width, height: geo.size.height)
-                        }
-                        .clipShape(
-                            RoundedRectangle(cornerRadius: 25.0)
-                        )
-                        .padding()
-                        .transition(.scale.combined(with: .opacity))
-                        .frame(maxWidth: .infinity, maxHeight: isVisionOpen ? .infinity : 0)
-                        .onAppear {
-                            Task {
-                                await model.camera.start()
-                            }
-                        }
-                        .onDisappear {
-                            model.camera.stop()
-                        }
+                        viewfinder
                     }
                     
                     if !images.isEmpty {
-                        GeometryReader { geo in
-                            if let img = getImage() {
-                                AsyncImage(url: img) { imgz in
-                                    imgz
-                                        .resizable()
-                                        .scaledToFill()
-                                } placeholder: {
-                                    ProgressView()
-                                }
-
-                            }
-                        }
-                        .clipShape(
-                            RoundedRectangle(cornerRadius: 25.0)
-                        )
-                        .padding()
-                        .transition(.scale.combined(with: .opacity))
-                        .frame(maxWidth: .infinity, maxHeight: !images.isEmpty ? .infinity : 0)
+                        imageViewfinder
                     }
                     
                     Spacer()
                     TipView(micTip)
-                    HStack {
-                        if !rabbitHole.isMeetingActive {
-                            HStack(spacing: 24) {
-                                Image("Rabbit")
-                                    .resizable()
-                                    .aspectRatio(contentMode: .fit)
-                                    .frame(height: !isVisionOpen && images.isEmpty ? isMicOpen ? 128*0.8 : 128 : isMicOpen ? 64*0.8 : 64)
-                                    .offset(y: isBouncing ? 5 : -5)
-                                    .onAppear {
-                                        withAnimation(.bounce()) {
-                                            isBouncing.toggle()
-                                        }
-                                    }
-                                    .transition(.slide)
-                                    .id("rabbit")
-                                if isMicOpen {
-                                    Image(systemName: "mic")
-                                        .font(.system(size: 82))
-                                }
-                            }
-                        } else {
-                            Image(systemName: "recordingtape")
-                                .resizable()
-                                .aspectRatio(contentMode: .fit)
-                                .frame(width: !isVisionOpen && images.isEmpty ? 128 : 64)
-                                .transition(.slide)
-                                .symbolEffect(.pulse, options: .repeat(.max))
-                                .id("rabbit")
-                        }
-                        if isVisionOpen || !images.isEmpty {
-                            chatbox
-                                .padding(.leading)
-                            Spacer()
-                        }
-                    }
-                    .padding(.horizontal)
+                    
+                    rabbit
                     if !isVisionOpen && images.isEmpty {
                         Spacer()
                         chatbox
@@ -358,6 +371,14 @@ struct ContentView: View {
                     currentlyPlaying = curPlaying
                 }
             }
+        }
+    }
+    
+    func getRabbitIconSize() -> Double {
+        if !isVisionOpen && images.isEmpty {
+            return isMicOpen ? 128*0.8 : 128
+        } else {
+            return isMicOpen ? 64*0.8 : 64
         }
     }
     
