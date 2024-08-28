@@ -178,7 +178,7 @@ struct ContentView: View {
                                 Image("Rabbit")
                                     .resizable()
                                     .aspectRatio(contentMode: .fit)
-                                    .frame(height: !isVisionOpen && images.isEmpty ? isMicOpen ? 128*0.8 : 128 : isMicOpen ? 64*0.8 : 64)
+                                    .frame(height: getRabbitIconSize())
                                     .offset(y: isBouncing ? 5 : -5)
                                     .onAppear {
                                         withAnimation(.bounce()) {
@@ -268,6 +268,14 @@ struct ContentView: View {
                     currentlyPlaying = curPlaying
                 }
             }
+        }
+    }
+    
+    func getRabbitIconSize() -> Double {
+        if !isVisionOpen && images.isEmpty {
+            return isMicOpen ? 128*0.8 : 128
+        } else {
+            return isMicOpen ? 64*0.8 : 64
         }
     }
     
