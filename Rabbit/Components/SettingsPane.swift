@@ -28,7 +28,7 @@ struct SettingsPane: View {
     @State private var revealCreds: Bool = false
     
     var rsgLink: AttributedString {
-        var attributedString = try! AttributedString(markdown: "[rabbitserver-go](https://firmburrow.rabbitu.de/Snow/rabbitserver-go)")
+        var attributedString = try! AttributedString(markdown: "[rabbitserver-go](https://github.com/KibbeWater/rabbitserver-go)")
         attributedString.foregroundColor = .accent
         return attributedString
     }
